@@ -7,6 +7,7 @@ import (
 
 	"github.com/Volkov-Stanislav/checker-reporter/config"
 	"github.com/Volkov-Stanislav/checker-reporter/metrics"
+	"github.com/Volkov-Stanislav/checker-reporter/winservice"
 )
 
 type Checker interface {
@@ -28,18 +29,25 @@ func NewRunner(cfg *config.Config, prom *metrics.Instance) *Runner {
 
 func (o *Runner) Run(checks ...Checker) {
 	var wg sync.WaitGroup
+	exitChan := winservice.ShutdownChannel()
+	ticker := time.NewTicker(time.Duration(o.cfg.UpdateInterval) * time.Second)
 
 	for {
-		for ip := range o.cfg.HostsMap {
-			for _, chk := range checks {
-				wg.Add(1)
-				fmt.Printf("RunCheck ip: %s,  chk: %#v \n", ip, chk)
+		select {
+		case <-exitChan:
+			fmt.Printf("OS command exit received \n")
+			return
+		case <-ticker.C:
+			wg.Wait()
 
-				go chk.Run(ip, &wg)
+			for ip := range o.cfg.HostsMap {
+				for _, chk := range checks {
+					wg.Add(1)
+					fmt.Printf("RunCheck ip: %s,  chk: %#v \n", ip, chk)
+
+					go chk.Run(ip, &wg)
+				}
 			}
 		}
-
-		wg.Wait()
-		time.Sleep(time.Duration(o.cfg.UpdateInterval) * time.Second)
 	}
 }

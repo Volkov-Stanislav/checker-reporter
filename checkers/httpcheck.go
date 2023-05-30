@@ -20,17 +20,21 @@ func NewHTTPCheck(prom *metrics.Instance, cfg *config.Config) *HTTPcheck {
 	var result HTTPcheck
 	result.prom = prom
 	result.cfg = cfg
-	
+
 	return &result
 }
 
 func (o *HTTPcheck) Run(address string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	
+
+	client := http.Client{
+		Timeout: 30 * time.Second,
+	}
+
 	t := time.Now()
 
 	url := "http://" + address + ":" + fmt.Sprint(o.cfg.CheckPort) + "/reporter"
-	response, err := http.Get(url)
+	response, err := client.Get(url)
 
 	if err != nil {
 		fmt.Println(err)

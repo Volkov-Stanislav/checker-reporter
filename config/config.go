@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	consulURL = "ipaddress:port"
+	consulURL = "consul.service.datacenter_msk1.consul:8500"
 )
 
 type Config struct {

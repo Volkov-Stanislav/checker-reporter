@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Volkov-Stanislav/checker-reporter/checkers"
 	"github.com/Volkov-Stanislav/checker-reporter/config"
@@ -13,8 +14,11 @@ import (
 const pingCount = 4
 
 func main() {
+	os.Exit(runProg())
+}
+
+func runProg() int {
 	cf := config.NewConfig()
-	//cf.Parse()
 	cf.ConsulParse()
 	fmt.Printf("Config: %#v \n", cf)
 
@@ -29,4 +33,6 @@ func main() {
 
 	r := service.NewRunner(cf, pr)
 	r.Run(pg, hck)
+
+	return 0
 }
