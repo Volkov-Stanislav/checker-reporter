@@ -1,5 +1,16 @@
 package config
 
+/*
+New Config - array of
+
+target_ip - ip-адрес машины на который установлено прила
+metric_port - static port
+hostname - имя хоста (согласовать маску для имен машин)
+geo_loc - принадлежность к ЦОД по геолокации
+virtual_type - тип виртуализации
+location_type - {DC/MAG} - влияет паттерн проверок
+*/
+
 import (
 	"encoding/json"
 	"fmt"
